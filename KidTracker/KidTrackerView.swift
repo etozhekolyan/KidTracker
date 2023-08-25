@@ -22,7 +22,17 @@ protocol ButtonHundlerDelegate: AnyObject {
 class KidTrackerView: UIView {
 //MARK: - Objects and UIelements
     public weak var hundlerDeleagte: ButtonHundlerDelegate?
-    let mapView = MKMapView()
+    private var annotationPoint = MKPointAnnotation()
+    private var descriptionView = DescriptionPointView()
+    private var kidsPoints: [MKPointAnnotation]?
+
+    let mapView: MKMapView = {
+        let mapView = MKMapView()
+        mapView.showsUserLocation = true
+        return mapView
+    }()
+    
+    
 
     private var locationButton: UIButton = {
         let button = UIButton()
@@ -58,6 +68,7 @@ class KidTrackerView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .red
+        mapView.delegate = self
         fillHierarchy()
         addTargets()
         setLayouts()
@@ -69,7 +80,12 @@ class KidTrackerView: UIView {
 //MARK: - View preparation
     private func fillHierarchy() {
         self.addSubview(mapView)
-        [locationButton, zoomInButton, zoomOutButton, nextTrackerButton].forEach {mapView.addSubview($0)}
+        [locationButton,
+         zoomInButton,
+         zoomOutButton,
+         nextTrackerButton,
+         descriptionView
+        ].forEach {mapView.addSubview($0)}
     }
     
     private func setLayouts() {
@@ -86,6 +102,9 @@ class KidTrackerView: UIView {
         nextTrackerButton.setAnchors(top: locationButton.topAnchor, botton: nil, left: nil, right: locationButton.trailingAnchor,
                                      padding: .init(top: 60, left: 0, bottom: 0, right: 0),
                                      size: .init(width: 50, height: 50))
+        descriptionView.setAnchors(top: nil, botton: mapView.bottomAnchor, left: mapView.leadingAnchor, right: mapView.trailingAnchor,
+                                   padding: .init(top: 0, left: 0, bottom: 0, right: 0),
+                                   size: .init(width: mapView.frame.width, height: 250))
     }
 
     private func addTargets() {
@@ -93,11 +112,29 @@ class KidTrackerView: UIView {
         zoomInButton.addTarget(self, action: #selector(hundleZoomButtons), for: .touchUpInside)
         zoomOutButton.addTarget(self, action: #selector(hundleZoomButtons), for: .touchUpInside)
     }
+    
+    private func configureAnnotationsPoints(kidsData: [KidModel]) {
+        for kidData in kidsData {
+            var kidPoint = MKPointAnnotation()
+            kidPoint.coordinate = kidData.location
+            kidPoint.title = kidData.name
+        }
+    }
 //MARK: - Public interface
-    public func setCurrentCoordinatesForMap(coordinates: CLLocationCoordinate2D?) {
-        guard let coordinates = coordinates else { return }
+    public func setCurrentCoordinatesForMap(centerCoordinates: CLLocationCoordinate2D?) {
+        guard let coordinates = centerCoordinates else { return }
         let region = MKCoordinateRegion(center: coordinates, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         mapView.setRegion(region, animated: true)
+    }
+    
+    public func putThePointKidCurrentLocation(centerCoordinates: CLLocationCoordinate2D?) {
+        guard let centerCoordinates = centerCoordinates else { return }
+        annotationPoint.coordinate = centerCoordinates
+        mapView.addAnnotation(annotationPoint)
+    }
+
+    public func transferKidsData(kidsData: [KidModel]) {
+        
     }
 //MARK: - ButtonHundlers
     @objc func hundleLocationButton(_ sender: UIButton) {
@@ -114,5 +151,30 @@ class KidTrackerView: UIView {
 
     @objc func hundleNextTrackerButton(_ sender: UIButton) {
         hundlerDeleagte?.showNextTracker()
+    }
+}
+//MARK: - Extension MKMapViewDelegate
+extension KidTrackerView: MKMapViewDelegate {
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if (annotation is MKUserLocation) {
+            return nil
+        }
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "myAnnotation")
+        
+        if annotationView == nil {
+            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: "myAnnotation")
+        } else {
+            annotationView?.annotation = annotation
+        }
+        let pinImage = UIImage(named: "pointer")
+        let size = CGSize(width: 50, height: 50)
+        UIGraphicsBeginImageContext(size)
+        pinImage?.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        
+        annotationView?.image = resizedImage
+        annotationView?.centerOffset = CGPoint(x: 0, y: -size.height / 2) // Adjust according to your needs
+        
+        return annotationView
     }
 }

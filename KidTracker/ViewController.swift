@@ -12,6 +12,7 @@ class ViewController: UIViewController {
 //MARK: - Objects
     private let kidTrackerView = KidTrackerView()
     private let locationManager = LocationManager()
+    private let kidLocation = CLLocationCoordinate2D(latitude: 37.785520, longitude:  -122.406608)
 //MARK: - VC life cicle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +30,8 @@ extension ViewController: ButtonHundlerDelegate {
     func hundleLocationButtonPress() {
         locationManager.startUpdating()
         guard let locationCoor = locationManager.getCurrentCoordinates() else { return }
-        kidTrackerView.setCurrentCoordinatesForMap(coordinates: locationCoor)
+        kidTrackerView.setCurrentCoordinatesForMap(centerCoordinates: locationCoor)
+        kidTrackerView.putThePointKidCurrentLocation(centerCoordinates: kidLocation)
         locationManager.stopUpdating()
     }
     
@@ -50,4 +52,10 @@ extension ViewController: ButtonHundlerDelegate {
     func showNextTracker() {
         // later
     }
+}
+
+struct KidModel {
+    var name: String
+    var image: String
+    var location: CLLocationCoordinate2D
 }
