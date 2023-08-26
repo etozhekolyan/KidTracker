@@ -15,7 +15,6 @@
 		4FA85C302A963311004FA820 /* KidTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA85C2F2A963311004FA820 /* KidTrackerView.swift */; };
 		4FA85C322A963EF6004FA820 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA85C312A963EF6004FA820 /* Extensions.swift */; };
 		4FA85C342A96519A004FA820 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA85C332A96519A004FA820 /* LocationManager.swift */; };
-		4FA85C362A976229004FA820 /* KidPointAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA85C352A976229004FA820 /* KidPointAnnotationView.swift */; };
 		4FA85C382A98BA15004FA820 /* DescriptionPointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA85C372A98BA15004FA820 /* DescriptionPointView.swift */; };
 /* End PBXBuildFile section */
 
@@ -30,7 +29,6 @@
 		4FA85C2F2A963311004FA820 /* KidTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KidTrackerView.swift; sourceTree = "<group>"; };
 		4FA85C312A963EF6004FA820 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		4FA85C332A96519A004FA820 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
-		4FA85C352A976229004FA820 /* KidPointAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KidPointAnnotationView.swift; sourceTree = "<group>"; };
 		4FA85C372A98BA15004FA820 /* DescriptionPointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionPointView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -70,7 +68,6 @@
 				4FA85C372A98BA15004FA820 /* DescriptionPointView.swift */,
 				4FA85C312A963EF6004FA820 /* Extensions.swift */,
 				4FA85C1F2A9632A0004FA820 /* ViewController.swift */,
-				4FA85C352A976229004FA820 /* KidPointAnnotationView.swift */,
 				4FA85C332A96519A004FA820 /* LocationManager.swift */,
 				4FA85C242A9632A2004FA820 /* Assets.xcassets */,
 				4FA85C262A9632A2004FA820 /* LaunchScreen.storyboard */,
@@ -151,7 +148,6 @@
 			files = (
 				4FA85C322A963EF6004FA820 /* Extensions.swift in Sources */,
 				4FA85C202A9632A0004FA820 /* ViewController.swift in Sources */,
-				4FA85C362A976229004FA820 /* KidPointAnnotationView.swift in Sources */,
 				4FA85C342A96519A004FA820 /* LocationManager.swift in Sources */,
 				4FA85C1C2A9632A0004FA820 /* AppDelegate.swift in Sources */,
 				4FA85C302A963311004FA820 /* KidTrackerView.swift in Sources */,

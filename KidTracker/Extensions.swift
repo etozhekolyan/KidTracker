@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import MapKit
  
 extension UIView {
     
@@ -43,6 +44,24 @@ extension UIView {
         }
         if size.height != 0 {
             heightAnchor.constraint(equalToConstant: size.height).isActive = true
+        }
+    }
+}
+
+extension MKPointAnnotation {
+    
+    private struct AssociatedKeys {
+        static var imageName = "imageName"
+    }
+//When you press on the annotation, a photo of the child should be displayed in the DescriptionView.
+//The most convenient way was to create this property through the extension,
+//so that the name of the photo could be passed to DesriptionView
+    var imageName: String {
+        get {
+            return objc_getAssociatedObject(self, &AssociatedKeys.imageName) as? String ?? ""
+        }
+        set {
+            objc_setAssociatedObject(self, &AssociatedKeys.imageName, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
 }

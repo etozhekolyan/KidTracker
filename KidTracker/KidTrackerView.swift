@@ -24,15 +24,13 @@ class KidTrackerView: UIView {
     public weak var hundlerDeleagte: ButtonHundlerDelegate?
     private var annotationPoint = MKPointAnnotation()
     private var descriptionView = DescriptionPointView()
-    private var kidsPoints: [MKPointAnnotation]?
+    private var kidsPoints: [MKPointAnnotation] = []
 
     let mapView: MKMapView = {
         let mapView = MKMapView()
         mapView.showsUserLocation = true
         return mapView
     }()
-    
-    
 
     private var locationButton: UIButton = {
         let button = UIButton()
@@ -102,7 +100,7 @@ class KidTrackerView: UIView {
         nextTrackerButton.setAnchors(top: locationButton.topAnchor, botton: nil, left: nil, right: locationButton.trailingAnchor,
                                      padding: .init(top: 60, left: 0, bottom: 0, right: 0),
                                      size: .init(width: 50, height: 50))
-        descriptionView.setAnchors(top: nil, botton: mapView.bottomAnchor, left: mapView.leadingAnchor, right: mapView.trailingAnchor,
+        descriptionView.setAnchors(top: mapView.bottomAnchor, botton: nil, left: mapView.leadingAnchor, right: mapView.trailingAnchor,
                                    padding: .init(top: 0, left: 0, bottom: 0, right: 0),
                                    size: .init(width: mapView.frame.width, height: 250))
     }
@@ -115,11 +113,18 @@ class KidTrackerView: UIView {
     
     private func configureAnnotationsPoints(kidsData: [KidModel]) {
         for kidData in kidsData {
-            var kidPoint = MKPointAnnotation()
+            let kidPoint = MKPointAnnotation()
             kidPoint.coordinate = kidData.location
             kidPoint.title = kidData.name
+            kidPoint.imageName = kidData.image
+            kidsPoints.append(kidPoint)
         }
     }
+    
+    private func putPointsOnTheMap() {
+        kidsPoints.forEach { mapView.addAnnotation($0) }
+    }
+
 //MARK: - Public interface
     public func setCurrentCoordinatesForMap(centerCoordinates: CLLocationCoordinate2D?) {
         guard let coordinates = centerCoordinates else { return }
@@ -134,7 +139,8 @@ class KidTrackerView: UIView {
     }
 
     public func transferKidsData(kidsData: [KidModel]) {
-        
+        configureAnnotationsPoints(kidsData: kidsData)
+        putPointsOnTheMap()
     }
 //MARK: - ButtonHundlers
     @objc func hundleLocationButton(_ sender: UIButton) {
@@ -150,7 +156,34 @@ class KidTrackerView: UIView {
     }
 
     @objc func hundleNextTrackerButton(_ sender: UIButton) {
+        // use mapView.selectAnnotation() function
         hundlerDeleagte?.showNextTracker()
+    }
+    
+//MARK: - Animations
+    //Increases the size of the MKAnnotationView when it is selected
+    private func increaseSelectedAnnotaion(view: MKAnnotationView) {
+        UIView.animate(withDuration: 0.5) {
+            view.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+        }
+    }
+    //reduces the size of the MKAnnotationView when it is selected
+    private func downsizeDeselectedAnnotation(view: MKAnnotationView) {
+        UIView.animate(withDuration: 0.5) {
+            view.transform = CGAffineTransform.identity
+        }
+    }
+    //smooth going up for descriptionView
+    private func animateEnteringFromBelow(view: UIView) {
+        UIView.animate(withDuration: 0.5) {
+            view.frame.origin.y -= 250
+        }
+    }
+     //smooth going down for descriptionView
+    private func animateCountyDown(view: UIView) {
+        UIView.animate(withDuration: 0.5) {
+            view.frame.origin.y += 250
+        }
     }
 }
 //MARK: - Extension MKMapViewDelegate
@@ -159,13 +192,16 @@ extension KidTrackerView: MKMapViewDelegate {
         if (annotation is MKUserLocation) {
             return nil
         }
-        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "myAnnotation")
+        
+        let annotationIdentifier = "myAnnotation"
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: annotationIdentifier)
         
         if annotationView == nil {
-            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: "myAnnotation")
+            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: annotationIdentifier)
         } else {
             annotationView?.annotation = annotation
         }
+        
         let pinImage = UIImage(named: "pointer")
         let size = CGSize(width: 50, height: 50)
         UIGraphicsBeginImageContext(size)
@@ -173,8 +209,22 @@ extension KidTrackerView: MKMapViewDelegate {
         let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
         
         annotationView?.image = resizedImage
-        annotationView?.centerOffset = CGPoint(x: 0, y: -size.height / 2) // Adjust according to your needs
+        annotationView?.centerOffset = CGPoint(x: 0, y: -size.height / 2)
         
         return annotationView
+    }
+    
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        increaseSelectedAnnotaion(view: view)
+        if let annotation = view.annotation as? MKPointAnnotation {
+            guard let title = annotation.title else { return }
+            animateEnteringFromBelow(view: descriptionView)
+            descriptionView.transferData(kidsName: title, kidsImage: annotation.imageName)
+        }
+    }
+    
+    func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
+        downsizeDeselectedAnnotation(view: view)
+        animateCountyDown(view: descriptionView)
     }
 }

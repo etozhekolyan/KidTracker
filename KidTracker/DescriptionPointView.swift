@@ -8,7 +8,7 @@
 import UIKit
 
 class DescriptionPointView: UIView {
-    
+//MARK: - UI elements
     private let kidImage: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -72,7 +72,7 @@ class DescriptionPointView: UIView {
         button.setTitleColor(.white, for: .normal)
         return button
     }()
-    
+//MARK: - initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -87,12 +87,12 @@ class DescriptionPointView: UIView {
     private func setupView() {
         self.backgroundColor = .white
     }
-    
-    private func transferData(kidsName: String, kidsImage: String) {
+//MARK: - Public interface
+    public func transferData(kidsName: String, kidsImage: String) {
         kidsNameLabel.text = kidsName
         kidImage.image = UIImage(named: kidsImage)
     }
-    
+//MARK: - setup view
     private func fillHierarhy() {
         [kidImage,
          kidsNameLabel,
@@ -105,7 +105,7 @@ class DescriptionPointView: UIView {
          showHistoryButton
         ].forEach { self.addSubview($0) }
     }
-    
+//MARK: - Layouts
     private func configureLayouts() {
         kidImage.setAnchors(top: self.topAnchor, botton: nil, left: self.leadingAnchor, right: nil,
                             padding: .init(top: 20, left: 15, bottom: 0, right: 0),
